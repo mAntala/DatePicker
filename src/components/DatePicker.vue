@@ -16,13 +16,13 @@
         <main class="date-picker__content">
             <section class="calendar">
                 <header class="calendar__day-titles">
-                    <span class="day-title">Mo</span>
-                    <span class="day-title">Tu</span>
-                    <span class="day-title">We</span>
-                    <span class="day-title">Th</span>
-                    <span class="day-title">Fr</span>
-                    <span class="day-title">Sa</span>
-                    <span class="day-title">Su</span>
+                    <span class="day-title">Po</span>
+                    <span class="day-title">Ut</span>
+                    <span class="day-title">St</span>
+                    <span class="day-title">Št</span>
+                    <span class="day-title">Pi</span>
+                    <span class="day-title">So</span>
+                    <span class="day-title">Ne</span>
                 </header>
                 <main class="calendar__days">
                     <div class="day"
@@ -34,6 +34,11 @@
                         <p class="day__content">{{ getDay( day ) }}</p>
                     </div>
                 </main>
+                <footer class="date-picker__footer">
+                    <span class="select-date__title">Select range:</span>
+                    <input v-model="inputDate.start" type="text" placeholder="deň.mesiac.rok" class="select-date" name="date-from">
+                    <input v-model="inputDate.end" type="text" placeholder="deň.mesiac.rok" class="select-date" name="date-to">
+                </footer>
             </section>
         </main>
 
@@ -59,7 +64,10 @@
             return {
                 today: new Date(),
                 date: new Date(),
-                inputDate: this.$attrs.value
+                inputDate: {
+                    start: "",
+                    end: ""
+                }
             };
         },
         methods: {
@@ -212,10 +220,6 @@
 
                 return calendar;
             }
-        },
-        mounted() {
-            // console.log( this.getNumberOfDaysInMonth( new Date() ) );
-            // console.log( this.getFirstDayOfMonth( new Date() ) );
         }
     };
 </script>
@@ -239,7 +243,7 @@
 
     .date-picker {
         background-color: #FFF;
-        padding: 24px;
+        padding: 16px;
         mix-blend-mode: normal;
 
 
@@ -267,7 +271,15 @@
             flex: 1 1 auto;
         }
 
-        &__content {}
+        &__content {
+            display: block;
+            margin-bottom: 24px;
+        }
+
+        &__footer {
+            display: flex;
+            align-items: center;
+        }
     }
 
     .calendar {
@@ -325,6 +337,29 @@
                 &__this-month {
                     color: #333333;
                 }
+            }
+        }
+
+        .select-date {
+            padding: 12px;
+            text-align: center;
+            font-family: Avenir, Helvetica, Arial, sans-serif;
+            border: 1px solid #DAE2E6;
+            border-radius: 6px;
+            outline: none;
+
+            &:first-of-type {
+                margin-right: 16px;
+            }
+
+            &:focus {
+                border: 1px solid darken( #DAE2E6, 10 );
+            }
+
+            &__title {
+                font-size: 12px;
+                color: #666666;
+                margin-right: 8px;
             }
         }
     }
