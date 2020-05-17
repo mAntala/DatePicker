@@ -155,6 +155,25 @@
                 }
                 this.selectClick = 0;
                 return this.$set( this.inputDate, 1, event.target.parentElement.getAttribute("data-date") );
+            },
+            highlightSelectedDates() {
+                let dateElements = Array.from( this.$el.querySelectorAll( ".day" ) );
+                dateElements.forEach( element => element.classList.remove("day__highlight", "day__highlight--first", "day__highlight--last") );
+
+                let firstDateElement = dateElements.filter( day => day.getAttribute( "data-date" ) === this.inputDate[0] )[0];
+                let secondDateElement = dateElements.filter( day => day.getAttribute( "data-date" ) === this.inputDate[1] )[0];
+
+                let highlightDays = dateElements.slice( dateElements.indexOf(firstDateElement), dateElements.indexOf(secondDateElement) + 1 );
+                highlightDays.forEach( (element, index) => {
+                    if( index === 0 ) {
+                        highlightDays[index].classList.add( "day__highlight--first" );
+                    }
+
+                    if( index === highlightDays.length - 1 ) {
+                        highlightDays[index].classList.add( "day__highlight--last" );
+                    }
+                    element.classList.add( "day__highlight" );
+                } );
             }
         },
         computed: {
@@ -267,23 +286,7 @@
                 this.inputDate[0] = formattedDates[0];
                 this.inputDate[1] = formattedDates[1];
 
-                let dateElements = Array.from( this.$el.querySelectorAll( ".day" ) );
-                dateElements.forEach( element => element.classList.remove("day__highlight", "day__highlight--first", "day__highlight--last") );
-
-                let firstDateElement = dateElements.filter( day => day.getAttribute( "data-date" ) === this.inputDate[0] )[0];
-                let secondDateElement = dateElements.filter( day => day.getAttribute( "data-date" ) === this.inputDate[1] )[0];
-
-                let highlightDays = dateElements.slice( dateElements.indexOf(firstDateElement), dateElements.indexOf(secondDateElement) + 1 );
-                highlightDays.forEach( (element, index) => {
-                    if( index === 0 ) {
-                        highlightDays[index].classList.add( "day__highlight--first" );
-                    }
-
-                    if( index === highlightDays.length - 1 ) {
-                        highlightDays[index].classList.add( "day__highlight--last" );
-                    }
-                    element.classList.add( "day__highlight" );
-                } );
+                this.highlightSelectedDates();
             }
         }
     };
