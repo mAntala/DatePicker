@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <DatePicker v-model="myDate" ref="picker"></DatePicker>
+    <DatePicker v-model="myDate" :highlightToday="true" ref="picker"></DatePicker>
   </div>
 </template>
 

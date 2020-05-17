@@ -30,14 +30,15 @@
                          :key="day"
                          :data-date="day"
                          :class="[isThisMonth(day), isToday(day)]"
+                         @click="selectDay"
                     >
                         <p class="day__content">{{ getDay( day ) }}</p>
                     </div>
                 </main>
                 <footer class="date-picker__footer">
                     <span class="select-date__title">Select range:</span>
-                    <input v-model="inputDate.start" type="text" placeholder="deň.mesiac.rok" class="select-date" name="date-from">
-                    <input v-model="inputDate.end" type="text" placeholder="deň.mesiac.rok" class="select-date" name="date-to">
+                    <input v-model="inputDate[0]" type="date" class="select-date" name="date-from">
+                    <input v-model="inputDate[1]" type="date" class="select-date" name="date-to">
                 </footer>
             </section>
         </main>
@@ -64,10 +65,8 @@
             return {
                 today: new Date(),
                 date: new Date(),
-                inputDate: {
-                    start: "",
-                    end: ""
-                }
+                inputDate: [],
+                selectClick: 0
             };
         },
         methods: {
@@ -111,6 +110,9 @@
                 return new Date( date ).getMonth() === currentMonth ? "day__this-month" : "";
             },
             isToday(date) {
+                if( !this.$props.highlightToday ) {
+                    return false;
+                }
                 let today = this.today;
                 let providedDate = new Date( date );
 
@@ -122,6 +124,37 @@
                     return "day__today";
                 }
                 return "";
+            },
+            compareDates( dates ) {
+                let formattedDates = [];
+
+                dates.forEach(date => {
+                    formattedDates.push(+new Date(date));
+                });
+
+                formattedDates.sort((a, b) => a - b);
+
+                return formattedDates;
+            },
+            formattedDate(date) {
+                let d = new Date( date );
+
+                let month = "" + ( d.getMonth() + 1 );
+                let year = d.getFullYear();
+                let day = "" + d.getDate();
+
+                month = month.length < 2 ? "0" + month : month;
+                day = day.length < 2 ? "0" + day : day;
+
+                return [ year, month, day ].join("-");
+            },
+            selectDay() {
+                if( !this.selectClick ) {
+                    this.selectClick = 1;
+                    return this.$set( this.inputDate, 0, event.target.parentElement.getAttribute("data-date") );
+                }
+                this.selectClick = 0;
+                return this.$set( this.inputDate, 1, event.target.parentElement.getAttribute("data-date") );
             }
         },
         computed: {
@@ -134,13 +167,14 @@
             },
             currentMonthDates() {
                 let numberOfDays = this.getNumberOfDaysInMonth(this.date);
-                let month = this.date.getMonth() + 1;
+                let month = this.date.getMonth();
 
                 let dates = [];
                 for( let i = 0; i < numberOfDays; i++ ) {
                     let day = i + 1;
 
-                    dates.push( month + "/" + day + "/" + this.date.getFullYear() );
+                    let date = new Date( this.today.getFullYear(), month, day );
+                    dates.push( this.formattedDate( date ) );
                 }
                 return dates;
             },
@@ -149,13 +183,14 @@
                 let prevMonth = new Date( date.setMonth( date.getMonth() - 1 ) );
 
                 let numberOfDays = this.getNumberOfDaysInMonth( prevMonth );
-                let month = prevMonth.getMonth() + 1;
+                let month = prevMonth.getMonth();
 
                 let dates = [];
                 for( let i = 0; i < numberOfDays; i++ ) {
                     let day = i + 1;
 
-                    dates.push( month + "/" + day + "/" + prevMonth.getFullYear() );
+                    let date = new Date( prevMonth.getFullYear(), month, day );
+                    dates.push( this.formattedDate( date ) );
                 }
 
                 return dates;
@@ -165,13 +200,14 @@
                 let nextMonth = new Date( date.setMonth( date.getMonth() + 1 ) );
 
                 let numberOfDays = this.getNumberOfDaysInMonth( nextMonth );
-                let month = nextMonth.getMonth() + 1;
+                let month = nextMonth.getMonth();
 
                 let dates = [];
                 for( let i = 0; i < numberOfDays; i++ ) {
                     let day = i + 1;
 
-                    dates.push( month + "/" + day + "/" + nextMonth.getFullYear() );
+                    let date = new Date( nextMonth.getFullYear(), month, day );
+                    dates.push( this.formattedDate( date ) );
                 }
 
                 return dates;
@@ -219,6 +255,17 @@
 
 
                 return calendar;
+            }
+        },
+        watch: {
+            inputDate( newVal ) {
+                let formattedDates = this.compareDates( newVal );
+                formattedDates = formattedDates.map( date => {
+                    return this.formattedDate( date );
+                } );
+
+                this.inputDate[0] = formattedDates[0];
+                this.inputDate[1] = formattedDates[1];
             }
         }
     };
