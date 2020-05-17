@@ -148,7 +148,7 @@
 
                 return [ year, month, day ].join("-");
             },
-            selectDay() {
+            selectDay(event) {
                 if( !this.selectClick ) {
                     this.selectClick = 1;
                     return this.$set( this.inputDate, 0, event.target.parentElement.getAttribute("data-date") );
@@ -266,6 +266,24 @@
 
                 this.inputDate[0] = formattedDates[0];
                 this.inputDate[1] = formattedDates[1];
+
+                let dateElements = Array.from( this.$el.querySelectorAll( ".day" ) );
+                dateElements.forEach( element => element.classList.remove("day__highlight", "day__highlight--first", "day__highlight--last") );
+
+                let firstDateElement = dateElements.filter( day => day.getAttribute( "data-date" ) === this.inputDate[0] )[0];
+                let secondDateElement = dateElements.filter( day => day.getAttribute( "data-date" ) === this.inputDate[1] )[0];
+
+                let highlightDays = dateElements.slice( dateElements.indexOf(firstDateElement), dateElements.indexOf(secondDateElement) + 1 );
+                highlightDays.forEach( (element, index) => {
+                    if( index === 0 ) {
+                        highlightDays[index].classList.add( "day__highlight--first" );
+                    }
+
+                    if( index === highlightDays.length - 1 ) {
+                        highlightDays[index].classList.add( "day__highlight--last" );
+                    }
+                    element.classList.add( "day__highlight" );
+                } );
             }
         }
     };
@@ -355,6 +373,7 @@
                 cursor: pointer;
                 position: relative;
                 color: lighten( #333333, 60 );
+                margin: 2px 0;
 
                 &:before {
                     display: block;
@@ -383,6 +402,20 @@
 
                 &__this-month {
                     color: #333333;
+                }
+
+                &__highlight {
+                    background-color: #CCF1FF;
+                    border-radius: 0;
+
+                    &--first {
+                        border-top-left-radius: 100%;
+                        border-bottom-left-radius: 100%;
+                    }
+                    &--last {
+                        border-top-right-radius: 100%;
+                        border-bottom-right-radius: 100%;
+                    }
                 }
             }
         }
