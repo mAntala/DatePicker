@@ -66,8 +66,7 @@
                 today: new Date(),
                 date: new Date(),
                 inputDate: [],
-                selectClick: 0,
-                calendar: {}
+                selectClick: 0
             };
         },
         methods: {
@@ -360,6 +359,24 @@
 
                 this.highlightSelectedDates();
             }
+        },
+        mounted() {
+            let bindValue = this.$attrs.value;
+
+            if( this.$props.range && !this.$props.formatted ) {
+                bindValue = bindValue.map( value => this.formattedDate( value ) );
+                this.$set( this.inputDate, 0, bindValue[0] );
+                this.$set( this.inputDate, 1, bindValue[1] );
+                return;
+            }
+
+            if( this.$props.formatted ) {
+                this.setFormattedDate( bindValue );
+                return;
+            }
+
+            let formattedDate = this.formattedDate( bindValue );
+            this.setFormattedDate( formattedDate );
         }
     };
 </script>
