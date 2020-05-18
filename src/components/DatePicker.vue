@@ -80,7 +80,7 @@
                 return ( new Date( date.getFullYear(), date.getMonth() ).getDay() );
             },
             getDaysFromPrevMonth(numOfDays) {
-                let prevMonth = this.prevMonthDates;
+                let prevMonth = this.getDates.prevMonth;
                 let dates = [];
 
                 for( let i = 0; i < numOfDays; i++ ) {
@@ -89,7 +89,7 @@
                 return dates;
             },
             getDaysFromNextMonth(numOfDays) {
-                let nextMonth = this.nextMonthDates;
+                let nextMonth = this.getDates.nextMonth;
 
                 let dates = [];
 
@@ -201,50 +201,36 @@
 
                 return dates;
             },
-            currentMonthDates() {
-                let numberOfDays = this.getNumberOfDaysInMonth(this.date);
-                let month = this.date.getMonth();
 
-                let dates = [];
-                for( let i = 0; i < numberOfDays; i++ ) {
-                    let day = i + 1;
-
-                    let date = new Date( this.today.getFullYear(), month, day );
-                    dates.push( this.formattedDate( date ) );
-                }
-                return dates;
-            },
-            prevMonthDates() {
+            getDates() {
                 let date = new Date( this.date );
-                let prevMonth = new Date( date.setMonth( date.getMonth() - 1 ) );
 
-                let numberOfDays = this.getNumberOfDaysInMonth( prevMonth );
-                let month = prevMonth.getMonth();
+                let months = {
+                    thisMonth: new Date( date ),
+                    prevMonth: new Date( date.setMonth( date.getMonth() - 1 ) ),
+                    nextMonth: new Date( date.setMonth( date.getMonth() + 2 ) )
+                };
 
-                let dates = [];
-                for( let i = 0; i < numberOfDays; i++ ) {
-                    let day = i + 1;
+                let numberOfDays = {
+                    thisMonth: this.getNumberOfDaysInMonth( months.thisMonth ),
+                    prevMonth: this.getNumberOfDaysInMonth( months.prevMonth ),
+                    nextMonth: this.getNumberOfDaysInMonth( months.nextMonth )
+                };
 
-                    let date = new Date( prevMonth.getFullYear(), month, day );
-                    dates.push( this.formattedDate( date ) );
-                }
+                let dates = {
+                    thisMonth: [],
+                    prevMonth: [],
+                    nextMonth: []
+                };
 
-                return dates;
-            },
-            nextMonthDates() {
-                let date = new Date( this.date );
-                let nextMonth = new Date( date.setMonth( date.getMonth() + 1 ) );
+                Object.entries(numberOfDays).forEach( entry => {
+                    for( let i = 0; i < entry[1]; i++ ) {
+                        let day = i + 1;
 
-                let numberOfDays = this.getNumberOfDaysInMonth( nextMonth );
-                let month = nextMonth.getMonth();
-
-                let dates = [];
-                for( let i = 0; i < numberOfDays; i++ ) {
-                    let day = i + 1;
-
-                    let date = new Date( nextMonth.getFullYear(), month, day );
-                    dates.push( this.formattedDate( date ) );
-                }
+                        let date = new Date( months[entry[0]].getFullYear(), months[entry[0]].getMonth(), day );
+                        dates[entry[0]].push( this.formattedDate( date ) );
+                    }
+                } );
 
                 return dates;
             },
@@ -253,7 +239,7 @@
 
                 let numberOfDaysInMonth = this.getNumberOfDaysInMonth( this.date );
                 let firstDayInMonth = this.getFirstDayOfMonth( this.date );
-                let currentMonthDays = this.currentMonthDates;
+                let currentMonthDays = this.getDates.thisMonth;
 
                 let calendar = [];
                 let date = 0;
