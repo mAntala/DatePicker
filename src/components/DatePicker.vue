@@ -16,13 +16,10 @@
         <main class="date-picker__content">
             <section class="calendar">
                 <header class="calendar__day-titles">
-                    <span class="day-title">Po</span>
-                    <span class="day-title">Ut</span>
-                    <span class="day-title">St</span>
-                    <span class="day-title">Št</span>
-                    <span class="day-title">Pi</span>
-                    <span class="day-title">So</span>
-                    <span class="day-title">Ne</span>
+                    <span class="day-title"
+                          v-for="day in weekdays"
+                          :key="day"
+                    >{{ day }}</span>
                 </header>
                 <main class="calendar__days">
                     <div class="day"
@@ -183,6 +180,26 @@
             currentMonth() {
                 let month = this.date.toLocaleString("default", { month: "long" });
                 return month.charAt(0).toUpperCase() + month.slice(1);
+            },
+            weekdays() {
+                let dates = [];
+                let firstDay = this.getFirstDayOfMonth( this.date );
+                let firstDayName = new Date( this.date.getFullYear(), this.date.getMonth() ).toLocaleString("default", { weekday: "long" }).substring(0,2);
+
+
+                for( let i = 1; i <= 7; i++ ) {
+                    let date = new Date( this.today.getFullYear(), this.today.getMonth(), i );
+                    dates.push( date.toLocaleString("default", { weekday: "long" }).substring(0,2) );
+                }
+
+                dates.map( date => {
+                    if( dates.indexOf( firstDayName ) !== firstDay - 1 ) {
+                        dates.push( dates.shift() );
+                    }
+                    return date;
+                } );
+
+                return dates;
             },
             currentMonthDates() {
                 let numberOfDays = this.getNumberOfDaysInMonth(this.date);
@@ -361,6 +378,7 @@
             .day-title {
                 color: rgba(0, 0, 0, 0.15);
                 width: calc(100% / 7);
+                text-transform: capitalize;
             }
         }
 
