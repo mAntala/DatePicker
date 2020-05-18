@@ -24,12 +24,11 @@
                 <main class="calendar__days">
                     <div class="day"
                          v-for="day in currentCalendar"
-                         :key="day"
-                         :data-date="day"
-                         :class="[isThisMonth(day), isToday(day)]"
-                         @click="selectDay"
+                         :key="day.date"
+                         :class="[isThisMonth(day.date), isToday(day.date), isSelected(day), isFirst(day), isLast(day)]"
+                         @click="selectDay(day.date)"
                     >
-                        <p class="day__content">{{ getDay( day ) }}</p>
+                        <p class="day__content">{{ getDay( day.date ) }}</p>
                     </div>
                 </main>
                 <footer class="date-picker__footer">
@@ -63,15 +62,18 @@
                 today: new Date(),
                 date: new Date(),
                 inputDate: [],
-                selectClick: 0
+                selectClick: 0,
+                calendar: {}
             };
         },
         methods: {
             nextMonth() {
                 this.date = new Date( this.date.setMonth( this.date.getMonth() + 1 ) );
+                this.highlightSelectedDates();
             },
             prevMonth() {
                 this.date = new Date( this.date.setMonth( this.date.getMonth() - 1 ) );
+                this.highlightSelectedDates();
             },
             getNumberOfDaysInMonth(date) {
                 return 32 - new Date( date.getFullYear(), date.getMonth(), 32 ).getDate();
@@ -122,6 +124,15 @@
                 }
                 return "";
             },
+            isSelected(dateObject) {
+                return ( dateObject.selected ) ? "day__highlight" : "";
+            },
+            isFirst(dateObject) {
+                return ( dateObject.first ) ? "day__highlight--first" : "";
+            },
+            isLast(dateObject) {
+                return ( dateObject.last ) ? "day__highlight--last" : "";
+            },
             compareDates( dates ) {
                 let formattedDates = [];
 
@@ -145,31 +156,55 @@
 
                 return [ year, month, day ].join("-");
             },
-            selectDay(event) {
+            selectDay(data) {
                 if( !this.selectClick ) {
                     this.selectClick = 1;
-                    return this.$set( this.inputDate, 0, event.target.parentElement.getAttribute("data-date") );
+                    return this.$set( this.inputDate, 0, data );
                 }
                 this.selectClick = 0;
-                return this.$set( this.inputDate, 1, event.target.parentElement.getAttribute("data-date") );
+                return this.$set( this.inputDate, 1, data );
             },
             highlightSelectedDates() {
-                let dateElements = Array.from( this.$el.querySelectorAll( ".day" ) );
-                dateElements.forEach( element => element.classList.remove("day__highlight", "day__highlight--first", "day__highlight--last") );
+                let calendar = this.currentCalendar;
 
-                let firstDateElement = dateElements.filter( day => day.getAttribute( "data-date" ) === this.inputDate[0] )[0];
-                let secondDateElement = dateElements.filter( day => day.getAttribute( "data-date" ) === this.inputDate[1] )[0];
+                let start = this.inputDate[0];
+                let end = this.inputDate[1];
 
-                let highlightDays = dateElements.slice( dateElements.indexOf(firstDateElement), dateElements.indexOf(secondDateElement) + 1 );
-                highlightDays.forEach( (element, index) => {
-                    if( index === 0 ) {
-                        highlightDays[index].classList.add( "day__highlight--first" );
+                let indexes = Object.entries(calendar).map( (dateObjects, index) => {
+                    let dateObject = dateObjects[1];
+                    return ( dateObject.date === start || dateObject.date === end ) ? index : null;
+                } ).filter( value => value );
+
+                this.currentCalendar.forEach( (value, index) => {
+                    value.selected = false;
+                    value.first = false;
+                    value.last = false;
+
+                    if( !indexes[1] && index === indexes[0] ) {
+                        value.selected = true;
+                        value.first = true;
+                        value.last = true;
+                        return value;
+                    }
+                    else if( indexes[0] && indexes[1] ) {
+                        value.selected = true;
+
+                        if( index === indexes[0] ) {
+                            value.first = true;
+                        }
+
+                        if( index === indexes[1] ) {
+                            value.last = true;
+                        }
+
+                        if( index < indexes[0] || index > indexes[1] ) {
+                            value.selected = false;
+                        }
+
+                        return value;
                     }
 
-                    if( index === highlightDays.length - 1 ) {
-                        highlightDays[index].classList.add( "day__highlight--last" );
-                    }
-                    element.classList.add( "day__highlight" );
+                    return value;
                 } );
             }
         },
@@ -201,7 +236,6 @@
 
                 return dates;
             },
-
             getDates() {
                 let date = new Date( this.date );
 
@@ -275,6 +309,14 @@
                     calendar[ calendar.length - 1 - i ] = nextMonthDaysToFill[i];
                 }
 
+                calendar = calendar.map( value => {
+                    return {
+                        date: value,
+                        selected: false,
+                    };
+                } );
+
+                // console.log( calendar );
 
                 return calendar;
             }
