@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <DatePicker v-model="myDate" :highlightToday="true" ref="picker"></DatePicker>
+    <DatePicker v-model="myDate" :highlightToday="true" :range="true" ref="picker"></DatePicker>
   </div>
 </template>
 
@@ -18,6 +18,10 @@ export default {
       // myDate: [new Date(1589278277000), new Date(1589278277000)],
       // myDate: "15-5-2020"
     };
+  },
+  mounted() {
+    this.$refs.picker.setFormattedDate( "18-05-2020" );
+    console.log( this.$refs.picker.getFormattedDate() );
   }
 };
 </script>

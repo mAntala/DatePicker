@@ -55,6 +55,10 @@
             range: {
                 type: Boolean,
                 default: false
+            },
+            formatted: {
+                type: Boolean,
+                default: false
             }
         },
         data() {
@@ -205,6 +209,29 @@
                     }
 
                     return value;
+                } );
+            },
+            setFormattedDate(date) {
+                let dateArray = date.split( "-" );
+                let formattedDate = [ dateArray[2], dateArray[1], dateArray[0]].join("-");
+
+                if( this.$props.range ) {
+                    let dateCopy = new Date( formattedDate );
+                    let nextDay = new Date( dateCopy.setDate( dateCopy.getDate() + 1 ) );
+
+                    this.$set( this.inputDate, 0, formattedDate );
+                    this.$set( this.inputDate, 1, this.formattedDate(nextDay) );
+                    return;
+                }
+
+                this.selectClick = 1;
+                this.$set( this.inputDate, 0, formattedDate );
+            },
+            getFormattedDate() {
+                let dates = this.inputDate;
+
+                return dates.map( date => {
+                    return date.split("-").reverse().join("-");
                 } );
             }
         },
