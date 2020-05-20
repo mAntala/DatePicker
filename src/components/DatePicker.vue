@@ -33,8 +33,8 @@
                 </main>
                 <footer class="date-picker__footer">
                     <span class="select-date__title">Select range:</span>
-                    <input v-model="inputDate[0]" type="date" class="select-date" name="date-from">
-                    <input v-model="inputDate[1]" type="date" class="select-date" name="date-to">
+                    <input disabled :value="getFormattedDate()[0]" type="text" class="select-date" name="date-from">
+                    <input disabled :value="getFormattedDate()[1]" type="text" class="select-date" name="date-to">
                 </footer>
             </section>
         </main>
@@ -381,7 +381,14 @@
     };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+    // Variables
+    $primaryColor: #00B2F2;
+    $highlightColor: #CCF1FF;
+    $headingColor: rgba( 0,0,0,.15 );
+    $bodyPadding: 30px;
+    $padding: 10px;
+
     .arrow {
         border: solid #666666;
         border-width: 0 3px 3px 0;
@@ -400,7 +407,7 @@
 
     .date-picker {
         background-color: #FFF;
-        padding: 16px;
+        padding: $bodyPadding;
         mix-blend-mode: normal;
 
 
@@ -448,7 +455,7 @@
             border-bottom: 1px solid rgba(0, 0, 0, 0.15);
 
             .day-title {
-                color: rgba(0, 0, 0, 0.15);
+                color: $headingColor;
                 width: calc(100% / 7);
                 text-transform: capitalize;
             }
@@ -487,7 +494,7 @@
                 }
 
                 &__today {
-                    background-color: #00B2F2;
+                    background-color: $primaryColor;
                     border-radius: 100%;
                     color: #FFFFFF;
                     font-weight: bold;
@@ -498,7 +505,7 @@
                 }
 
                 &__highlight {
-                    background-color: #CCF1FF;
+                    background-color: $highlightColor;
                     border-radius: 0;
 
                     &--first {
